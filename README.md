@@ -4,14 +4,12 @@
 [![](https://images.microbadger.com/badges/image/admarasco/trac-ubi.svg)](https://hub.docker.com/r/admarasco/trac-ubi/)
 [![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac-ubi.svg)](https://hub.docker.com/r/admarasco/trac-ubi/)
 
-This repo is used to host a bunldle to create a container (based on
-Ubuntu Xenial) running [Trac](http://trac.edgewall.org),
-which is an enhanced wiki and issue tracking system for software development
-projects. Trac uses a minimalistic approach to web-based software project
-management. It helps developers write great software while staying out of
-the way. Trac should impose as little as possible on a team's established
-development process and policies.
+This repo is used to host a bundle to create a container based on Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/) running [Trac](http://trac.edgewall.org),
+which is an enhanced wiki and issue tracking system for software development projects.
 
+Trac uses a minimalistic approach to web-based software project management. It helps developers write great software while staying out of the way. Trac should impose as little as possible on a team's established development process and policies.
+
+The author of this bundle has been using Trac on and off for about fifteen years (since around 2006 in the Trac 0.9 days).
 
 # How to get the image
 
@@ -44,8 +42,6 @@ After several seconds, you can visit the web page at
 <http://localhost:8123>
 
 ## Environment Variables Explanations
-
-Most of below
 
 * `TRAC_ADMIN_NAME` (default is `trac_admin`):
 
@@ -92,9 +88,8 @@ Most of below
 ## Wants More Secure
 
 This container image is powered by [Apache Web Server](https://httpd.apache.org/).
-You can make your own customizations (such as adding TLS etc.) in
-`./trac.conf` and map to `/etc/apache2/sites-available/trac.conf` when
-starting a container.
+
+You can make your own customizations (such as adding TLS, etc.) in `./trac.conf` and map to `/etc/apache2/sites-available/trac.conf` when starting a container.
 
 ```
 $ podman run -d -p 8123:8123 -v ./trac.conf:/etc/apache2/sites-available/trac.conf --name my_trac admarasco/trac-ubi
