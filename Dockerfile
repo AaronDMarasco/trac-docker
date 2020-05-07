@@ -60,7 +60,7 @@ RUN rm -rf /workspace/RPMs/*debuginfo*
 FROM registry.access.redhat.com/ubi8/ubi:latest
 
 WORKDIR /container_info
-COPY --from=builder /workspace/RPMs/*.rpm .
+COPY --from=builder /workspace/RPMs/*.rpm /container_info/
 # RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN dnf remove -y --disableplugin subscription-manager {dnf-plugin-,}subscription-manager && \
     dnf install -y -v httpd /container_info/*.rpm && \
@@ -77,7 +77,7 @@ ARG TRAC_INI="${TRAC_DIR}/conf/trac.ini"
 ARG DB_LINK=sqlite:db/trac.db
 
 # This brings in the helper script (to minimize layers) as well as leaves behind the configuration info
-COPY Dockerfile trac_setup.sh trac.conf .
+COPY Dockerfile trac_setup.sh trac.conf /container_info/
 
 RUN chmod a+x trac_setup.sh && ./trac_setup.sh "${TRAC_ADMIN_NAME}" "${TRAC_ADMIN_PASSWD}" "${TRAC_PROJECT_NAME}" "${TRAC_DIR}" "${TRAC_INI}" "${DB_LINK}"
 
