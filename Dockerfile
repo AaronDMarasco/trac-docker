@@ -10,11 +10,14 @@ WORKDIR /workspace
 # RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-PowerTools.repo
 
 # This is to fix problems I had on DockerHub that I thought were fixed pre-DNF days...
-RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' --enablerepo 'epel' -y dnf-plugin-ovl
+# RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+# RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' --enablerepo 'epel' -y dnf-plugin-ovl
+
+# TEMPORARY!
+ADD https://raw.githubusercontent.com/AaronDMarasco/dnf-plugin-ovl/master/ovl.py /usr/lib/python3.6/site-packages/dnf-plugins/
+# COPY dnf-plugin-ovl-0.0.4-1.el8.noarch.rpm /workspace/
+# RUN touch /var/lib/rpm/* && rpm -ih /workspace/dnf-plugin-ovl-0.0.4-1.el8.noarch.rpm
 RUN dnf upgrade -v -y --refresh
-# This was crashing on Docker Hub sometimes here, so just in case, we'll reset everything
-# RUN rm -rf /var/cache/dnf && dnf clean all
 # I think the genshi specfile is broken - it shouldn't need python3 devel to build python2, but this is easier than fixing it...
 RUN dnf install -y rpm-build python2-devel python2-jinja2 gcc httpd-devel make python3-devel python3-setuptools
 
@@ -32,7 +35,7 @@ ARG TRAC_RPM_SRC_URL=https://download.fedoraproject.org/pub/fedora/linux/release
 ARG TRAC_INI_RPM_SRC=trac-iniadmin-plugin-0.3-10.20151226svn13607.fc32.src.rpm
 ARG TRAC_INI_RPM_SRC_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/32/Everything/source/tree/Packages/t/${TRAC_INI_RPM_SRC}
 
-ADD ${GENSHI_SRC_URL} ${MOD_WSGI_SRC_URL} ${TRAC_RPM_SRC_URL} ${TRAC_INI_RPM_SRC_URL} /workspace
+ADD ${GENSHI_SRC_URL} ${MOD_WSGI_SRC_URL} ${TRAC_RPM_SRC_URL} ${TRAC_INI_RPM_SRC_URL} /workspace/
 
 RUN rpmbuild --rebuild ${GENSHI_SRC}
 RUN dnf install -y ~/rpmbuild/RPMS/x86_64/python2-genshi-*rpm
@@ -61,7 +64,7 @@ WORKDIR /container_info
 COPY --from=builder /workspace/RPMs/*.rpm .
 # RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN dnf remove -y --disableplugin subscription-manager {dnf-plugin-,}subscription-manager && \
-    dnf install -y httpd /container_info/*.rpm && \
+    dnf install -y -v httpd /container_info/*.rpm && \
     dnf clean all && \
     rm -rf /usr/share/{doc,info,man} && \
     rm -rf /var/cache/dnf
