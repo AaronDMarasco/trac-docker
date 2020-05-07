@@ -8,6 +8,10 @@ WORKDIR /workspace
 # Normally, you don't do dnf on multiple lines when building a container, but this will
 # be thrown away.
 # RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-PowerTools.repo
+
+# This is to fix problems I had on DockerHub that I thought were fixed pre-DNF days...
+RUN touch /var/lib/rpm/* && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN touch /var/lib/rpm/* && dnf install dnf-plugin-ovl
 RUN dnf upgrade -y --refresh
 # This was crashing on Docker Hub sometimes here, so just in case, we'll reset everything
 RUN rm -rf /var/cache/dnf && dnf clean all
