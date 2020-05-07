@@ -13,10 +13,9 @@ WORKDIR /workspace
 # RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' --enablerepo 'epel' -y dnf-plugin-ovl
 
-# TEMPORARY!
+# TEMPORARY! I fixed overlay detection and until that change propagates to EPEL, the above won't work.
 ADD https://raw.githubusercontent.com/AaronDMarasco/dnf-plugin-ovl/master/ovl.py /usr/lib/python3.6/site-packages/dnf-plugins/
-# COPY dnf-plugin-ovl-0.0.4-1.el8.noarch.rpm /workspace/
-# RUN touch /var/lib/rpm/* && rpm -ih /workspace/dnf-plugin-ovl-0.0.4-1.el8.noarch.rpm
+
 RUN dnf upgrade -v -y --refresh
 # I think the genshi specfile is broken - it shouldn't need python3 devel to build python2, but this is easier than fixing it...
 RUN dnf install -y rpm-build python2-devel python2-jinja2 gcc httpd-devel make python3-devel python3-setuptools
