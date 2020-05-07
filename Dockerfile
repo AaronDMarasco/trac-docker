@@ -10,11 +10,11 @@ WORKDIR /workspace
 # RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-PowerTools.repo
 
 # This is to fix problems I had on DockerHub that I thought were fixed pre-DNF days...
-RUN touch /var/lib/rpm/* && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN touch /var/lib/rpm/* && dnf install dnf-plugin-ovl
-RUN dnf upgrade -y --refresh
+RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN touch /var/lib/rpm/* && dnf install --disablerepo '*' --enablerepo 'epel' -y dnf-plugin-ovl
+RUN dnf upgrade -v -y --refresh
 # This was crashing on Docker Hub sometimes here, so just in case, we'll reset everything
-RUN rm -rf /var/cache/dnf && dnf clean all
+# RUN rm -rf /var/cache/dnf && dnf clean all
 # I think the genshi specfile is broken - it shouldn't need python3 devel to build python2, but this is easier than fixing it...
 RUN dnf install -y rpm-build python2-devel python2-jinja2 gcc httpd-devel make python3-devel python3-setuptools
 
