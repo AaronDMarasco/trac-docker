@@ -41,7 +41,7 @@ $ podman run -d -p 8123:8123 --name my_trac admarasco/trac-ubi
 After several seconds, you can visit the web page at
 <http://localhost:8123>
 
-## Image Build-Time Environment Variables
+## Image Build-Time Arguments
 
 * `TRAC_ADMIN_NAME` (default is `trac_admin`):
 
