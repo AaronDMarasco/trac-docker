@@ -9,6 +9,8 @@ WORKDIR /workspace
 # be thrown away.
 # RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-PowerTools.repo
 RUN dnf upgrade -y --refresh
+# This was crashing on Docker Hub sometimes here, so just in case, we'll reset everything
+RUN rm -rf /var/cache/dnf && rpmdb --rebuilddb
 # I think the genshi specfile is broken - it shouldn't need python3 devel to build python2, but this is easier than fixing it...
 RUN dnf install -y rpm-build python2-devel python2-jinja2 gcc httpd-devel make python3-devel python3-setuptools
 
