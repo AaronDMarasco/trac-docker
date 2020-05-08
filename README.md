@@ -1,8 +1,8 @@
 # trac-docker
 
-[![](https://images.microbadger.com/badges/version/admarasco/trac-ubi.svg)](https://hub.docker.com/r/admarasco/trac-ubi/ "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/admarasco/trac-ubi.svg)](https://hub.docker.com/r/admarasco/trac-ubi/)
-[![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac-ubi.svg)](https://hub.docker.com/r/admarasco/trac-ubi/)
+[![](https://images.microbadger.com/badges/version/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/ "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
+[![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 
 This repo is used to host a bundle to create a container based on Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/) running [Trac](http://trac.edgewall.org),
 which is an enhanced wiki and issue tracking system for software development projects.
@@ -24,7 +24,7 @@ The author of this bundle has been using Trac on and off for about fifteen years
 * Just pull it from Docker hub
 
     ```
-    $ podman pull docker://docker.io/admarasco/trac-ubi
+    $ podman pull docker://docker.io/admarasco/trac
     ```
 
 
@@ -35,7 +35,7 @@ The author of this bundle has been using Trac on and off for about fifteen years
 Just run
 
 ```
-$ podman run -d -p 8123:8123 --name my_trac admarasco/trac-ubi
+$ podman run -d -p 8123:8123 --name my_trac admarasco/trac
 ```
 
 After several seconds, you can visit the web page at
@@ -91,7 +91,7 @@ This container image is powered by [Apache Web Server](https://httpd.apache.org/
 You can make your own customizations (such as adding TLS, etc.) in `./trac.conf` and map to `/etc/apache2/sites-available/trac.conf` when starting a container.
 
 ```
-$ podman run -d -p 8123:8123 -v ./trac.conf:/etc/apache2/sites-available/trac.conf --name my_trac admarasco/trac-ubi
+$ podman run -d -p 8123:8123 -v ./trac.conf:/etc/apache2/sites-available/trac.conf --name my_trac admarasco/trac
 ```
 
 # Reference
