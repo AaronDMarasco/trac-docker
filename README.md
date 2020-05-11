@@ -1,7 +1,7 @@
 # trac-docker
 
-[![](https://images.microbadger.com/badges/version/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/ "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
+[![](https://images.microbadger.com/badges/version/admarasco/trac.svg)](https://microbadger.com/images/admarasco/trac "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://microbadger.com/images/admarasco/trac "Get your own image badge on microbadger.com")
 [![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 
 This repo is used to host a bundle to create a container based on Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/) running [Trac](http://trac.edgewall.org),
