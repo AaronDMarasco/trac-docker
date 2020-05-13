@@ -1,7 +1,7 @@
 # trac-docker
 
-[![](https://images.microbadger.com/badges/version/admarasco/trac.svg)](https://microbadger.com/images/admarasco/trac "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://microbadger.com/images/admarasco/trac "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/ "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 [![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 
 This repo is used to host a bundle to create a container based on Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/) running [Trac](http://trac.edgewall.org),
@@ -11,37 +11,68 @@ Trac uses a minimalistic approach to web-based software project management. It h
 
 The author of this bundle has been using Trac on and off for about fifteen years (since around 2006 in the Trac 0.9 days).
 
-# How to get the image
+_Note_: This document uses `podman`, but every command shown _should_ work using the `docker` executable with the same options if you are using an older Fedora-based system or a non-Fedora-based Linux distribution.
 
-* Build it using `Dockerfile`
-
-    ```ssh
-    $ git clone https://github.com/aarondmarasco/trac-docker
-    $ cd trac-docker
-    $ podman build -t trac ./
-    ```
-
-* Just pull it from Docker hub
-
-    ```
-    $ podman pull docker://docker.io/admarasco/trac
-    ```
-
-
-# How to run the container
-
-## Quick Start
-
-Just run
-
+# Running Pre-Built Image as Container
 ```
+$ podman pull docker://docker.io/admarasco/trac  # Optional but speeds up next step
 $ podman run -d -p 8123:8123 --name my_trac admarasco/trac
 ```
 
-After several seconds, you can visit the web page at
-<http://localhost:8123>
+After several seconds, you can visit the web page at <http://localhost:8123>
+
+## Plugins
+The image has the following plugins already installed / enabled, with minimal testing:
+ * [AddHeadersPlugin](https://trac-hacks.org/wiki/AddHeadersPlugin)
+ * [AdvParseArgsPlugin](https://trac-hacks.org/wiki/AdvParseArgsPlugin)
+ * [ChangeLogMacro](# https://trac-hacks.org/wiki/ChangeLogMacro)
+ * [OnSiteNotificationsPlugin](https://trac-hacks.org/wiki/OnSiteNotificationsPlugin)
+ * [PrivateTicketsPlugin](https://trac-hacks.org/wiki/PrivateTicketsPlugin)
+ * [TracIniAdminPanelPlugin](https://trac-hacks.org/wiki/TracIniAdminPanelPlugin)
+ * [WeekPlanPlugin](https://trac-hacks.org/wiki/WeekPlanPlugin)
+ * [WikiAutoCompletePlugin](https://trac-hacks.org/wiki/WikiAutoCompletePlugin)
+ * [WikiExtrasPlugin](https://trac-hacks.org/wiki/WikiExtrasPlugin)
+
+The following are available, but not enabled in `trac.ini` (visit <http://localhost:8123/admin/general/plugin> to enable):
+
+ * [FullBlogPlugin](https://trac-hacks.org/wiki/FullBlogPlugin)
+
+See below for more information on adding additional plugins.
+
+## Persistent Storage (Volume)
+ * This will store the data in a volume, allowing the container to be destroyed / recreated.
+ * This command line needs to change if you custom build an image using `TRAC_DIR` below.
+ * The volume will be pre-populated on first run
+ * See `podman help volume` for more info
+```
+$ podman run -d -p 8123:8123 --name my_trac --mount type=volume,source=trac-vol,destination=/srv/trac admarasco/trac
+```
+
+## Viewing Logs
+If you need to see what is happening, `httpd`'s logs have been redirected for capture in a container-standard manner:
+```
+$ podman logs my_trac
+```
+
+## Backing Up Data
+To get a copy of the entire trac environment from a running container (named `my_trac`):
+```
+$ podman exec my_trac trac-admin /srv/trac/ hotcopy /tmp/backup
+$ podman cp my_trac:/tmp/backup ./backup
+```
+
+# Rebuilding Image
+Build it using `Dockerfile`
+```
+$ git clone https://github.com/aarondmarasco/trac-docker
+$ cd trac-docker
+$ podman build -t trac ./
+# OR
+$ podman build --build-arg TRAC_PROJECT_NAME="My Super Awesome Trac Project" -t trac ./
+```
 
 ## Image Build-Time Arguments
+*WARNING*: Persistent storage will likely break if you change these _after_ creating a volume.
 
 * `TRAC_ADMIN_NAME` (default is `trac_admin`):
 
@@ -55,7 +86,7 @@ After several seconds, you can visit the web page at
 
     the Trac project name
 
-* `TRAC_DIR` (default is `/var/local/trac`):
+* `TRAC_DIR` (default is `/srv/trac`):
 
     This directory stores all the data and configurations. You can bind a volume
     when starting a container.
@@ -83,17 +114,23 @@ After several seconds, you can visit the web page at
         read the [MySqlDb](https://trac.edgewall.org/intertrac/MySqlDb) page
         before creating the database.
 
+## Adding Plugins
+One of Trac's draws are the plethora of plugins available on [Trac-Hacks](https://trac-hacks.org/).
+To add your own, you will need to edit the `Dockerfile` (to get them into the image) as well as `trac_setup.sh` (to configure `trac.ini`, etc).
+Both files have examples to help you along.
 
-## Misc Security
-
+## Misc Apache Configuration
 This container image is powered by [Apache Web Server](https://httpd.apache.org/).
 
-You can make your own customizations (such as adding TLS, etc.) in `./trac.conf` and map to `/etc/apache2/sites-available/trac.conf` when starting a container.
+You can make your own customizations (such as adding TLS, etc.) in `./trac.conf` and map to `/etc/httpd/conf.d/trac.conf` when starting a container.
 
 ```
-$ podman run -d -p 8123:8123 -v ./trac.conf:/etc/apache2/sites-available/trac.conf --name my_trac admarasco/trac
+$ podman run -d -p 8123:8123 -v ./trac.conf:/etc/httpd/conf.d/trac.conf --name my_trac admarasco/trac
 ```
+
+To extract the `trac.conf` customized by the build process, use `podman cp` to copy out `/etc/httpd/conf.d/trac.conf` .
 
 # Reference
 
 * [Trac Official Doc](https://trac.edgewall.org/wiki/TracGuide)
+* [Docker Volumes](https://docs.docker.com/storage/volumes/)
