@@ -25,7 +25,7 @@ After several seconds, you can visit the web page at <http://localhost:8123>
 The image has the following plugins already installed / enabled, with minimal testing:
  * [AddHeadersPlugin](https://trac-hacks.org/wiki/AddHeadersPlugin)
  * [AdvParseArgsPlugin](https://trac-hacks.org/wiki/AdvParseArgsPlugin)
- * [ChangeLogMacro](# https://trac-hacks.org/wiki/ChangeLogMacro)
+ * [ChangeLogMacro](https://trac-hacks.org/wiki/ChangeLogMacro)
  * [OnSiteNotificationsPlugin](https://trac-hacks.org/wiki/OnSiteNotificationsPlugin)
  * [PrivateTicketsPlugin](https://trac-hacks.org/wiki/PrivateTicketsPlugin)
  * [TracIniAdminPanelPlugin](https://trac-hacks.org/wiki/TracIniAdminPanelPlugin)
