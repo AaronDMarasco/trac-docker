@@ -62,12 +62,14 @@ RUN chmod a+x /workspace/plugin_builder.sh
 # You need to check if the URL has "tags" or not and set appropriately
 # It will download https://trac-hacks.org/browser/${PLUGIN}/${PLUGIN_VERSION}?format=zip
 # unless you give it a third argument, a double-quoted ZIP source URL (cannot just use "trunk")
+RUN /workspace/plugin_builder.sh accountmanagerplugin trunk "https://trac-hacks.org/browser/accountmanagerplugin/trunk?rev=17755&format=zip"
 RUN /workspace/plugin_builder.sh addheadersplugin 0.12
 RUN /workspace/plugin_builder.sh advparseargsplugin 0.11
 RUN /workspace/plugin_builder.sh changelogmacro trunk "https://trac-hacks.org/browser/changelogmacro/trunk?rev=17738&format=zip"
 RUN /workspace/plugin_builder.sh fullblogplugin 1.4
 RUN /workspace/plugin_builder.sh onsitenotificationsplugin trunk "https://trac-hacks.org/browser/onsitenotificationsplugin/trunk?rev=17740&format=zip"
 RUN /workspace/plugin_builder.sh privateticketsplugin tags/2.3.0
+RUN /workspace/plugin_builder.sh tagsplugin trunk "https://trac-hacks.org/browser/tagsplugin/trunk?rev=17752&format=zip"
 RUN /workspace/plugin_builder.sh traciniadminpanelplugin trunk "https://trac-hacks.org/browser/traciniadminpanelplugin/trunk?rev=17740&format=zip"
 RUN /workspace/plugin_builder.sh weekplanplugin tags/weekplan-1.3
 RUN /workspace/plugin_builder.sh wikiautocompleteplugin trunk "https://trac-hacks.org/browser/wikiautocompleteplugin/trunk?rev=17740&format=zip"
@@ -93,8 +95,11 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 WORKDIR /container_info
 COPY --from=builder /workspace/RPMs/*.rpm /workspace/RPMs/*.egg /container_info/
 # RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+# UBI's AppStream is very limited, so we need to pull subversion/mod_dav_svn from CentOS8
+RUN printf '[c8-appstream]\nname=CentOS 8 AppStream\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/$basearch/os/\nenabled = 0\ngpgcheck = 0' > /etc/yum.repos.d/c8-appstream.repo
 RUN dnf remove -y --disableplugin subscription-manager {dnf-plugin-,}subscription-manager && \
     dnf install -y -v httpd /container_info/*.rpm && \
+    dnf install -y --disablerepo '*' --enablerepo c8-appstream subversion mod_dav_svn && \
     dnf clean all && \
     rm -rf /usr/share/{doc,info,man} && \
     rm -rf /var/cache/dnf

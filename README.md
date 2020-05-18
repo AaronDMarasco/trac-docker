@@ -23,11 +23,13 @@ After several seconds, you can visit the web page at <http://localhost:8123>
 
 ## Plugins
 The image has the following plugins already installed / enabled, with minimal testing:
+ * [AccountManagerPlugin](https://trac-hacks.org/wiki/AccountManagerPlugin)
  * [AddHeadersPlugin](https://trac-hacks.org/wiki/AddHeadersPlugin)
  * [AdvParseArgsPlugin](https://trac-hacks.org/wiki/AdvParseArgsPlugin)
  * [ChangeLogMacro](https://trac-hacks.org/wiki/ChangeLogMacro)
  * [OnSiteNotificationsPlugin](https://trac-hacks.org/wiki/OnSiteNotificationsPlugin)
  * [PrivateTicketsPlugin](https://trac-hacks.org/wiki/PrivateTicketsPlugin)
+ * [TagsPlugin](https://trac-hacks.org/wiki/TagsPlugin)
  * [TracIniAdminPanelPlugin](https://trac-hacks.org/wiki/TracIniAdminPanelPlugin)
  * [WeekPlanPlugin](https://trac-hacks.org/wiki/WeekPlanPlugin)
  * [WikiAutoCompletePlugin](https://trac-hacks.org/wiki/WikiAutoCompletePlugin)
@@ -46,6 +48,12 @@ See below for more information on adding additional plugins.
  * See `podman help volume` for more info
 ```
 $ podman run -d -p 8123:8123 --name my_trac --mount type=volume,source=trac-vol,destination=/srv/trac admarasco/trac
+```
+
+### Exposed Apache Configuration
+You can extend the above example to have all httpd configuration available in a separate volume as well:
+```
+$ podman run -d -p 8123:8123 --name my_trac --mount type=volume,source=trac-vol,destination=/srv/trac --mount type=volume,source=trac-http-conf-vol,destination=/etc/httpd/conf.d admarasco/trac
 ```
 
 ## Viewing Logs
