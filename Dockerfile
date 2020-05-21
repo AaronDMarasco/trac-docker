@@ -38,7 +38,7 @@ ADD ${GENSHI_SRC_URL} ${MOD_WSGI_SRC_URL} ${TRAC_RPM_SRC_URL} /workspace/
 RUN rpmbuild --rebuild ${GENSHI_SRC}
 RUN dnf install -y ~/rpmbuild/RPMS/x86_64/python2-genshi-*rpm
 
-# The mod_wsgi package needs to have the specfile edited; it  forces with_python2 and 3 based on OS versions with no way to override...
+# The mod_wsgi package needs to have the specfile edited; it forces with_python2 and 3 based on OS versions with no way to override...
 RUN mkdir wsgi
 WORKDIR /workspace/wsgi
 RUN rpm2cpio ../${MOD_WSGI_SRC} | cpio -div
@@ -95,11 +95,12 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 WORKDIR /container_info
 COPY --from=builder /workspace/RPMs/*.rpm /workspace/RPMs/*.egg /container_info/
 # RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-# UBI's AppStream is very limited, so we need to pull subversion/mod_dav_svn from CentOS8
-RUN printf '[c8-appstream]\nname=CentOS 8 AppStream\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/$basearch/os/\nenabled = 0\ngpgcheck = 0' > /etc/yum.repos.d/c8-appstream.repo
+# UBI's AppStream is very limited, so we need to pull subversion/mod_dav_svn from WANdisco's distribution (CentOS 8 AppStream doesn't include subversion-python)
+RUN printf '[c8-appstream]\nname=CentOS 8 AppStream\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/$basearch/os/\nenabled = 0\ngpgcheck = 0\n\n[wandisco-svn]\nname=WANdisco Subversion\nbaseurl = http://opensource.wandisco.com/centos/8/svn-1.9/RPMS/$basearch/\nenabled = 0\ngpgcheck = 0' > /etc/yum.repos.d/extra_repos.repo
+
 RUN dnf remove -y --disableplugin subscription-manager {dnf-plugin-,}subscription-manager && \
-    dnf install -y -v httpd /container_info/*.rpm && \
-    dnf install -y --disablerepo '*' --enablerepo c8-appstream subversion mod_dav_svn && \
+    dnf install -y -v httpd python36 /container_info/*.rpm && \
+    dnf install -y --disablerepo '*' --enablerepo wandisco-svn libserf subversion subversion-python subversion-tools mod_dav_svn && \
     dnf clean all && \
     rm -rf /usr/share/{doc,info,man} && \
     rm -rf /var/cache/dnf
