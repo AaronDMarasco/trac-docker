@@ -4,7 +4,7 @@
 [![](https://images.microbadger.com/badges/image/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 [![Docker Hub](http://img.shields.io/docker/pulls/admarasco/trac.svg)](https://hub.docker.com/r/admarasco/trac/)
 
-This repo is used to host a bundle to create a container based on Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/) running [Trac](http://trac.edgewall.org),
+This repo is used to host a bundle to create a container based on ~~Red Hat's [UBI](https://developers.redhat.com/products/rhel/ubi/)~~ Fedora 31 (until `trac` moved to Python 3) running [Trac](http://trac.edgewall.org),
 which is an enhanced wiki and issue tracking system for software development projects.
 
 Trac uses a minimalistic approach to web-based software project management. It helps developers write great software while staying out of the way. Trac should impose as little as possible on a team's established development process and policies.
@@ -126,6 +126,9 @@ $ podman build --build-arg TRAC_PROJECT_NAME="My Super Awesome Trac Project" -t 
 One of Trac's draws are the plethora of plugins available on [Trac-Hacks](https://trac-hacks.org/).
 To add your own, you will need to edit the `Dockerfile` (to get them into the image) as well as `trac_setup.sh` (to configure `trac.ini`, etc).
 Both files have examples to help you along.
+
+Once they've been built, they are copied into `/container_info/` within the image, _e.g._ `TracTags-0.12.dev0-py2.7.egg` as well as under the `plugins` directory of the example project.
+If you already have a project using external volumes (as noted above), you will need to copy the `*.egg` for your plugins into your existing project(s).
 
 ## Misc Apache Configuration
 This container image is powered by [Apache Web Server](https://httpd.apache.org/).

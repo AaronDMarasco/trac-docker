@@ -1,5 +1,0 @@
-Test IniAdmin plugin
-Ensure tickets can be created, etc.
-Look at other plugins
-External volumes for the trac data
-  - Ensure persistance if main image rebuilt
