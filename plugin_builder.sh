@@ -10,24 +10,20 @@ die() {
 PLUGIN="$1"
 PLUGIN_VERSION="$2"
 PLUGIN_URL="$3"
-echo "Installing Trac plugin ${PLUGIN} version ${PLUGIN_VERSION}"
+printf "\nBuilding Trac plugin ${PLUGIN} (${PLUGIN_VERSION})\n"
 if [ -n "${PLUGIN_URL}" ]; then
-    echo "Using forced URL: ${PLUGIN_URL}"
+    true
+    # echo "Using forced URL: ${PLUGIN_URL}"
 else
     PLUGIN_URL="https://trac-hacks.org/browser/${PLUGIN}/${PLUGIN_VERSION}?format=zip"
-    echo "Using generated URL: ${PLUGIN_URL}"
+    # echo "Using generated URL: ${PLUGIN_URL}"
 fi
 
 mkdir /workspace-${PLUGIN}
 cd /workspace-${PLUGIN}
-wget -O ./${PLUGIN}.zip "${PLUGIN_URL}"
-unzip ./${PLUGIN}.zip
+wget --no-verbose --output-document=./${PLUGIN}.zip "${PLUGIN_URL}"
+unzip -q ./${PLUGIN}.zip
 cd $(basename ${PLUGIN_VERSION})
-# This is extremely poorly tested and currently unused. Don't.
-if [ x"${RPMNEEDED}" == x1 ]; then
-    python2 ./setup.py bdist_rpm
-    mv -v dist/*noarch.rpm /workspace/RPMs/
-else
-    python2 ./setup.py bdist_egg
-    mv -v dist/*.egg /workspace/RPMs/
-fi
+echo "Logging build to /workspace/eggs/logs/${PLUGIN}.log"
+python2 ./setup.py bdist_egg > /workspace/eggs/logs/${PLUGIN}.log 2>&1
+mv -v dist/*.egg /workspace/eggs/
