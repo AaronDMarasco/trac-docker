@@ -1,9 +1,6 @@
 # I guess we're screwed May 2021...
 # Eventually, when trac moves to py3, we'll move (back) to UBI
 FROM fedora:31 AS builder
-MAINTAINER = Aaron D. Marasco <trac-docker@marascos.net>
-# User can expose anything they want and override with "-p" option
-EXPOSE 8123
 
 RUN mkdir -p /workspace/RPMs
 WORKDIR /workspace
@@ -49,12 +46,20 @@ RUN rm -rf /workspace/RPMs/*debuginfo*
 
 # Now we build the actual image we are distributing so minimize layers
 FROM fedora:31
+LABEL maintainer="Aaron D. Marasco <trac-docker@marascos.net>"
+# User can expose anything they want and override with "-p" option
+EXPOSE 8123
+
 WORKDIR /container_info
 COPY --from=builder /workspace/RPMs/*.rpm /workspace/RPMs/*.egg /container_info/
-RUN dnf install -y /container_info/*.rpm mod_wsgi libserf subversion subversion-python subversion-tools mod_dav_svn && \
+
+# This brings in the helper script (to minimize layers) as well as leaves behind the configuration info
+COPY Dockerfile trac_setup.sh trac.conf /container_info/
+
+RUN dnf upgrade -v -y --refresh && \
+    dnf install -y /container_info/*.rpm mod_wsgi libserf subversion subversion-python subversion-tools mod_dav_svn && \
     dnf clean all && \
-    rm -rf /usr/share/{doc,info,man} && \
-    rm -rf /var/cache/dnf
+    rm -rf /usr/share/doc /usr/share/info /usr/share/man /var/cache/dnf
 
 # All ARGS reset at FROM so can't be at the top
 ARG TRAC_ADMIN_NAME=trac_admin
@@ -63,9 +68,6 @@ ARG TRAC_PROJECT_NAME=trac_project
 ARG TRAC_DIR=/srv/trac
 ARG TRAC_INI="${TRAC_DIR}/conf/trac.ini"
 ARG DB_LINK=sqlite:db/trac.db
-
-# This brings in the helper script (to minimize layers) as well as leaves behind the configuration info
-COPY Dockerfile trac_setup.sh trac.conf /container_info/
 
 RUN chmod a+x trac_setup.sh && ./trac_setup.sh "${TRAC_ADMIN_NAME}" "${TRAC_ADMIN_PASSWD}" "${TRAC_PROJECT_NAME}" "${TRAC_DIR}" "${TRAC_INI}" "${DB_LINK}"
 
